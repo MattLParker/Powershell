@@ -3,6 +3,8 @@ Clear-Host
 Write-Host "Connecting to ActiveDirectory"
 
 $DC = ($env:LOGONSERVER -replace "\\", "")
+
+#Generate random password
 $PasswordList = "Information", "Technology", "Computer", "Telephone", "Welcome", "Password", "Teacher", "Student", "Hello", "Government", "Support"
 $password1 = Get-Random $PasswordList
 $password2 = Get-Random $PasswordList
@@ -139,13 +141,13 @@ Set-MsolUserLicense -UserPrincipalName $upn.UserPrincipalName -AddLicenses $SKU.
 $CreatedBy = Get-ADUser "$env:username" -properties Mail
 $email = ($ADAccountName + "@" + $Domain)
 $mx = (Resolve-DnsName -Name $Domain -Type MX | Sort-Object -Property Preference | select-object nameexchange -first 1)
-$ExchangeSMTP = $mx.nameexchange
+$EmailSMTP = $mx.nameexchange
 
 # Notify Admin
 $searcher = [adsisearcher]"(samaccountname=$env:USERNAME)"
 $emailcreate = $searcher.FindOne().Properties.mail
 $msg = new-object Net.Mail.MailMessage
-$smtp = new-object Net.Mail.SmtpClient($ExchangeSMTP)
+$smtp = new-object Net.Mail.SmtpClient($EmailSMTP)
 $msg.From = "$($CreatedBy.Mail)"
 $msg.To.Add("$emailcreate")
 $msg.subject = "$email Created"
