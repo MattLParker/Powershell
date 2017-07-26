@@ -33,7 +33,7 @@ Write-Host ""
 Write-Host "Please enter the following required details:"
 $FirstName = read-host "Firstname"
 $FirstName = $FirstName.substring(0, 1).toupper() + $FirstName.substring(1).tolower()   
-$MiddleName = read-host "Middle Name or Initial"
+$MiddleName = read-host "Middle Name or Initial (Optional)"
 $middleempty = ([string]::IsNullOrEmpty($MiddleName))
 if ( $middleempty -ne "True"){
     $MiddleName = $MiddleName.substring(0, 1).toupper() + $MiddleName.substring(1).tolower()
