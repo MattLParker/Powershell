@@ -2,7 +2,13 @@ cls
 Write-Host "Connecting to ActiveDirectory"
 
 $DC = ($env:LOGONSERVER -replace “\\”, “”)
- 
+$PasswordList = "Information", "Technology", "Computer", "Telephone", "Welcome", "Password", "Teacher", "Student", "Hello", "Government", "Support"
+$password1 = Get-Random $PasswordList
+$password2 = Get-Random $PasswordList
+$passnumber = Get-random -minimum 0 -Maximum 9
+$password = $password1 + $password2 + $passnumber
+
+
 #Initiate Remote PS Session to local DC
 $ADPowerShell = New-PSSession -ComputerName $DC -Authentication Default 
  
@@ -49,7 +55,7 @@ $ADAccountName = ($FirstInitial + $Surname)
 $UserCheck = Get-ADUser -LDAPFilter "(sAMAccountName=$ADAccountName)"
 If (($UserCheck) -eq $null) {
     write-host -ForegroundColor Green "Active Directory user account created"
-    New-ADUser -DisplayName:($Surname + ", " + $FirstName) -GivenName:$FirstName -Name:($Surname + ", " + $FirstName) -Path:$ADPath -SamAccountName:$ADAccountName -Server:$DC -Surname:$Surname -Type:"user" -UserPrincipalName:($ADAccountName + "@" + $Domain) -EmailAddress:($ADAccountName + "@" + $Domain) -AccountPassword:(ConvertTo-SecureString "Welcome01" -AsPlainText -Force) -Enabled:$true
+    New-ADUser -DisplayName:($Surname + ", " + $FirstName) -GivenName:$FirstName -Name:($Surname + ", " + $FirstName) -Path:$ADPath -SamAccountName:$ADAccountName -Server:$DC -Surname:$Surname -Type:"user" -UserPrincipalName:($ADAccountName + "@" + $Domain) -EmailAddress:($ADAccountName + "@" + $Domain) -AccountPassword:(ConvertTo-SecureString $password -AsPlainText -Force) -Enabled:$true
     Set-ADAccountControl -AccountNotDelegated:$false -AllowReversiblePasswordEncryption:$false -CannotChangePassword:$false -DoesNotRequirePreAuth:$false -Identity:$ADAccountName -PasswordNeverExpires:$false -Server:$DC -UseDESKeyOnly:$false
 }
 Else {
@@ -57,14 +63,14 @@ Else {
     $ADAccountName = ($FirstInitial + $MiddleInitial + $Surname)
     $UserCheck = Get-ADUser -LDAPFilter "(sAMAccountName=$ADAccountName)"
     If (($UserCheck) -eq $null) {
-        New-ADUser -DisplayName:($Surname + ", " + $FirstName) -GivenName:$FirstName -Name:($Surname + ", " + $FirstName) -Path:$ADPath -SamAccountName:$ADAccountName -Server:$DC -Surname:$Surname -Type:"user" -UserPrincipalName:($ADAccountName + "@" + $Domain) -Description:$ADAccountName -EmailAddress:($ADAccountName + "@" + $Domain) -AccountPassword:(ConvertTo-SecureString "Welcome01" -AsPlainText -Force) -Enabled:$true
+        New-ADUser -DisplayName:($Surname + ", " + $FirstName) -GivenName:$FirstName -Name:($Surname + ", " + $FirstName) -Path:$ADPath -SamAccountName:$ADAccountName -Server:$DC -Surname:$Surname -Type:"user" -UserPrincipalName:($ADAccountName + "@" + $Domain) -Description:$ADAccountName -EmailAddress:($ADAccountName + "@" + $Domain) -AccountPassword:(ConvertTo-SecureString $password -AsPlainText -Force) -Enabled:$true
         Set-ADAccountControl -AccountNotDelegated:$false -AllowReversiblePasswordEncryption:$false -CannotChangePassword:$false -DoesNotRequirePreAuth:$false -Identity:$ADAccountName -PasswordNeverExpires:$false -Server:$DC -UseDESKeyOnly:$false
     }
     Else {
         $ADAccountName = Read-Host "The automatically generated username ($AdAccountName) for $FirstName $Surname also failed. Please Try something else"
         $UserCheck = Get-ADUser -LDAPFilter "(sAMAccountName=$ADAccountName)"
         If (($UserCheck) -eq $null) {
-            New-ADUser -DisplayName:($Surname + ", " + $FirstName) -GivenName:$FirstName -Name:($Surname + ", " + $FirstName) -Path:$ADPath -SamAccountName:$ADAccountName -Server:$DC -Surname:$Surname -Type:"user" -UserPrincipalName:($ADAccountName + "@" + $Domain) -Description:$ADAccountName -EmailAddress:($ADAccountName + "@" + $Domain) -AccountPassword:(ConvertTo-SecureString "Welcome01" -AsPlainText -Force) -Enabled:$true
+            New-ADUser -DisplayName:($Surname + ", " + $FirstName) -GivenName:$FirstName -Name:($Surname + ", " + $FirstName) -Path:$ADPath -SamAccountName:$ADAccountName -Server:$DC -Surname:$Surname -Type:"user" -UserPrincipalName:($ADAccountName + "@" + $Domain) -Description:$ADAccountName -EmailAddress:($ADAccountName + "@" + $Domain) -AccountPassword:(ConvertTo-SecureString $password -AsPlainText -Force) -Enabled:$true
             Set-ADAccountControl -AccountNotDelegated:$false -AllowReversiblePasswordEncryption:$false -CannotChangePassword:$false -DoesNotRequirePreAuth:$false -Identity:$ADAccountName -PasswordNeverExpires:$false -Server:$DC -UseDESKeyOnly:$false
         }
         Else {
@@ -92,7 +98,7 @@ $365 = $ADAccountName + $rDomain
 Enable-RemoteMailbox -remoteroutingaddress "$365"  -Identity $ADAccountName -Alias $ADAccountName | Out-Null
 invoke-command -computername Azure -ScriptBlock {Start-ADSyncSyncCycle -PolicyType Delta}| Out-Null
 Write-Host -ForegroundColor Yellow "Waiting 120 seconds for Exchange details to apply to Azure (O365)"
-sleep -Seconds 120
+Start-Sleep -Seconds 120
  
 
 #assign 365 liscense
@@ -124,7 +130,7 @@ $smtp = new-object Net.Mail.SmtpClient($ExchangeSMTP)
 $msg.From = "$($CreatedBy.Mail)"
 $msg.To.Add("$emailcreate")
 $msg.subject = "$email Created"
-$msg.body = "$($CreatedBy.Name) has created a new user account for $FirstName $Surname. Username: $email Password is Welcome01" 
+$msg.body = "$($CreatedBy.Name) has created a new user account for $FirstName $Surname. Username: $email Password is $password" 
 $msg.priority = [System.Net.Mail.MailPriority]::Low
 $smtp.Send($msg)
  
