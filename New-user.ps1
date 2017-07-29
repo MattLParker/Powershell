@@ -122,11 +122,13 @@ Start-Sleep -Seconds 120
 
 #assign 365 liscense
 
-Write-host "Please login to Azure to add license"
+Write-host "Attempting to login to O365"
 
 #Attempt to connect to Office 365 if function is in profile o365 else do it the slow way
 Try{o365}
-catch {Import-Module MSOnline
+catch {
+Write-host "Please login to Azure to add license"    
+Import-Module MSOnline
 Connect-MsolService}
 
 #Set License Info
