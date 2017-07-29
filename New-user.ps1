@@ -167,7 +167,7 @@ Write-Host -ForegroundColor Green "Displaying Active Directory Account Details"
 Get-ADUser $ADAccountName
 Get-remoteMailbox -Identity $ADAccountName | Format-Table DisplayName, PrimarySMTPAddress
  
-Write-Host -ForegroundColor Green "Password = Welcome01"
+Write-Host -ForegroundColor Green "Password = $password"
  
 # Remove Remote PowerShell Sessions
 Get-PSSession | remove-pssession
