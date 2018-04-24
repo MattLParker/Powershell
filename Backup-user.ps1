@@ -1,6 +1,8 @@
 $storage = "\\nas007\users\"
 $user = [System.Security.Principal.WindowsIdentity]::GetCurrent().Name
-$user = $user.Replace("MACONBIBB\", "")
+$domain = get-content env:UserDomain
+$user = $user.Replace($domain, "")
+$user = $user.Replace("\", "")
 $outname = $user + ".txt"
 $userprofile = $env:USERPROFILE
 $outfolder = $storage + $user
@@ -10,7 +12,7 @@ $Userout = "Username: " + $user
 $userout | out-file $out -Append   
 "
 Network Shares: "| out-file $out -Append   
-Get-CimInstance -Class Win32_NetworkConnection | where {$_.LocalName -ne $null} | Select-Object LocalName, RemoteName| out-file $out -Append   
+Get-CimInstance -Class Win32_NetworkConnection | where-object {$_.LocalName -ne $null} | Select-Object LocalName, RemoteName| out-file $out -Append   
 "
 Printers: "| out-file $out -Append 
 
@@ -58,7 +60,7 @@ foreach ($key in $subkeys) {
 } 
 
 
-$prog | Where-Object { $_.DisplayName } | select DisplayName, DisplayVersion, Publisher | Sort-object DisplayName |ft -auto | out-file $out -Append   
+$prog | Where-Object { $_.DisplayName } | Select-Object DisplayName, DisplayVersion, Publisher | Sort-object DisplayName |Format-Table -auto | out-file $out -Append   
 
 #$chrome = $userprofile + "\AppData\Local\Google\Chrome\User Data\Default\"
 #Robocopy.exe "`"$chrome'"" "`"$outfolder`"" bookmarks*
