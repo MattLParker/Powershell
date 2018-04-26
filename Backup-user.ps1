@@ -11,7 +11,11 @@ $out = $outfolder + "\" + $outname
 $Userout = "Username: " + $user
 $userout | out-file $out -Append   
 "
-Network Shares: "| out-file $out -Append   
+HostName: "| out-file $out -Append
+$env:computername | out-file $out -Append
+
+Get-NetIPAddress | Where-object addressstate -EQ preferred| Select-Object IPAddress | out-file $out -Append
+"Network Shares: "| out-file $out -Append   
 Get-CimInstance -Class Win32_NetworkConnection | where-object {$_.LocalName -ne $null} | Select-Object LocalName, RemoteName| out-file $out -Append   
 "
 Printers: "| out-file $out -Append 
