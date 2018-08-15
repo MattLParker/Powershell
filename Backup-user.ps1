@@ -1,4 +1,7 @@
-$storage = "c:\temp\"
+$storage = "H:\temp\"
+$BackupFolders = @("Documents","Pictures","Desktop","Links","Videos")
+
+
 $user = [System.Security.Principal.WindowsIdentity]::GetCurrent().Name
 $domain = get-content env:UserDomain
 $user = $user.Replace($domain, "")
@@ -10,6 +13,7 @@ try { get-item $outfolder -ErrorAction stop | Out-Null}
 catch [System.Management.Automation.ItemNotFoundException]{
     New-Item -ItemType directory -Path $outfolder | Out-Null
 }
+write-host "Starting TXT file"
 $out = $outfolder + "\" + $outname
 $Userout = "Username: " + $user
 $userout | out-file $out -Append   
@@ -42,7 +46,7 @@ $Taskbar | out-file $out -Append
 "
 Programs: "| out-file $out -Append 
 
-
+write-host "Getting Installed Apps"
 $prog = @()
 $UninstallKey = "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall" 
 $reg = [microsoft.win32.registrykey]::OpenRemoteBaseKey('LocalMachine', $computername) 
@@ -69,12 +73,21 @@ foreach ($key in $subkeys) {
 
 $prog | Where-Object { $_.DisplayName } | Select-Object DisplayName, DisplayVersion, Publisher | Sort-object DisplayName |Format-Table -auto | out-file $out -Append   
 
+#Chrome Backup
+if (test-path "$userprofile\appdata\local\google\"){
+    write-host "Backing up Chrome Bookmarks"
 $chrome = $userprofile + "\AppData\Local\Google\Chrome\User Data"
 Get-ChildItem $chrome -include Bookmarks* -Recurse | copy-item -Destination $outfolder
-
+}
 #PST backup
+write-host "Killing Outlook/Skype/Teams to backup all psts in $userprofile"
 get-process *outlook* | Stop-Process
 get-process *teams* | Stop-Process
 get-process *Lync* | Stop-Process
 get-process *skype* | Stop-Process
-get-childitem $userprofile -name -File -include *.pst -recurse -force| ForEach-Object{copy-item "$userprofile\$_" -Destination $outfolder}
+Write-host "Finding and coping all .psts"
+get-childitem $userprofile -name -File -include *.pst -recurse -force| 
+Write-host "Backing up user Data Folders"
+foreach ($folder in $BackupFolders) {
+    copy-item "$userprofile\$folder" "$outfolder\$folder" -Recurse
+}
