@@ -86,7 +86,7 @@ get-process *teams* | Stop-Process
 get-process *Lync* | Stop-Process
 get-process *skype* | Stop-Process
 Write-host "Finding and coping all .psts"
-get-childitem $userprofile -name -File -include *.pst -recurse -force| Copy-item -Destination $outfolder
+get-childitem $userprofile -name -File -include *.pst -recurse -force| ForEach-Object{copy-item "$userprofile\$_" -Destination $outfolder}
 Write-host "Backing up user Data Folders"
 foreach ($folder in $BackupFolders) {
     copy-item "$userprofile\$folder" "$outfolder\$folder" -Recurse
