@@ -9,9 +9,9 @@ $CloudCred = New-Object System.Management.Automation.PSCredential $CloudUsername
 Connect-MsolService -Credential $CloudCred
 
 #Set Variables
-$L = New-MsolLicenseOptions -AccountSkuId default:ENTERPRISEPACK_GOV
+$L = New-MsolLicenseOptions -AccountSkuId default:ENTERPRISEPACK
 $usagelocation="US"
-$SKU="default:ENTERPRISEPACK_GOV"
+$SKU="default:ENTERPRISEPACK"
 
 #The Magic Happens.
 Get-Mailbox -ResultSize Unlimited -RecipientTypeDetails UserMailbox | Get-MsolUser | 
