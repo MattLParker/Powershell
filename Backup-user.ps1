@@ -69,12 +69,12 @@ foreach ($key in $subkeys) {
 
 $prog | Where-Object { $_.DisplayName } | Select-Object DisplayName, DisplayVersion, Publisher | Sort-object DisplayName |Format-Table -auto | out-file $out -Append   
 
-$chrome = $userprofile + "\AppData\Local\Google\Chrome\User Data\Default"
-$what = "Bookmarks*"
-$cmdArgs = @("$chrome","$outfolder","$what")
-Robocopy.exe @cmdargs
+$chrome = $userprofile + "\AppData\Local\Google\Chrome\User Data"
+Get-ChildItem $chrome -include Bookmarks* -Recurse | copy-item -Destination $outfolder
 
-
-#WIP
-#robocopy.exe $source $dest /E /ZB /R:0 /W:0 /XJ /NFL /XD appdata OneDrive “Temporary Internet Files” OfficeFileCache Temp *cache* Spotify WER /XF *cache* *.ost
-
+#PST backup
+get-process *outlook* | Stop-Process
+get-process *teams* | Stop-Process
+get-process *Lync* | Stop-Process
+get-process *skype* | Stop-Process
+get-childitem $userprofile -name -File -include *.pst -recurse -force| ForEach-Object{copy-item "$userprofile\$_" -Destination $outfolder}
