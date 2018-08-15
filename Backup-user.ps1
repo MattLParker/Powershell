@@ -1,4 +1,4 @@
-$storage = "\\nas007\users\"
+$storage = "c:\temp\"
 $user = [System.Security.Principal.WindowsIdentity]::GetCurrent().Name
 $domain = get-content env:UserDomain
 $user = $user.Replace($domain, "")
@@ -6,7 +6,10 @@ $user = $user.Replace("\", "")
 $outname = $user + ".txt"
 $userprofile = $env:USERPROFILE
 $outfolder = $storage + $user
-New-Item -ItemType directory -Path $outfolder | Out-Null
+try { get-item $outfolder -ErrorAction stop | Out-Null}
+catch [System.Management.Automation.ItemNotFoundException]{
+    New-Item -ItemType directory -Path $outfolder | Out-Null
+}
 $out = $outfolder + "\" + $outname
 $Userout = "Username: " + $user
 $userout | out-file $out -Append   
@@ -23,7 +26,7 @@ Printers: "| out-file $out -Append
 $fullprinters = get-printer 
 
 
-$Printers = $fullprinters -notmatch 'PDF|Onenote|WebEx|Microsoft XPS|Fax' | select-object Name, DriverName, PortName 
+$Printers = $fullprinters -notmatch 'PDF|Onenote|WebEx|Microsoft XPS|Fax|ImageRight|Document Converter' | select-object Name, DriverName, PortName 
 
 $Printers | out-file $out -Append   
 "
