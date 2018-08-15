@@ -69,8 +69,10 @@ foreach ($key in $subkeys) {
 
 $prog | Where-Object { $_.DisplayName } | Select-Object DisplayName, DisplayVersion, Publisher | Sort-object DisplayName |Format-Table -auto | out-file $out -Append   
 
-#$chrome = $userprofile + "\AppData\Local\Google\Chrome\User Data\Default\"
-#Robocopy.exe "`"$chrome'"" "`"$outfolder`"" bookmarks*
+$chrome = $userprofile + "\AppData\Local\Google\Chrome\User Data\Default"
+$what = "Bookmarks*"
+$cmdArgs = @("$chrome","$outfolder","$what")
+Robocopy.exe @cmdargs
 
 
 #WIP
