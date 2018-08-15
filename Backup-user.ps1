@@ -8,7 +8,7 @@ $user = $user.Replace($domain, "")
 $user = $user.Replace("\", "")
 $outname = $user + ".txt"
 $userprofile = $env:USERPROFILE
-$outfolder = $storage + $user
+$outfolder = $storage + "Backup"
 try { get-item $outfolder -ErrorAction stop | Out-Null}
 catch [System.Management.Automation.ItemNotFoundException]{
     New-Item -ItemType directory -Path $outfolder | Out-Null
