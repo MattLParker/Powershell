@@ -55,7 +55,7 @@ if ($checkemail -like "*$newdomain") {
                 $emailinhex = $splitemail[3] 
                 $parsedwithnull = ($emailinhex -split "(..)"|Where-Object {$_}| ForEach-Object {[char][convert]::ToInt16($_, 16)}) -join ""
                 $parsed = $parsedwithnull -replace ("\x00", "")
-                if ($parsed -notlike "Public Folders*" -and $parsed -notlike "Outlook Data File" -and $parsed -notlike "Sharepoint Lists" -and $parsed -like '*@$olddomain') {
+                if ($parsed -notlike "Public Folders*" -and $parsed -notlike "Outlook Data File" -and $parsed -notlike "Sharepoint Lists" -and $parsed -like "*@$olddomain") {
                     #Change EMail
                     $email = $parsed -replace "@.*", "@$newdomain"
                     $email2 = $email
@@ -76,7 +76,6 @@ if ($checkemail -like "*$newdomain") {
                 
                     reg add $exportname /f /v 001f3001 /t REG_BINARY /d $c
 
-                    $emailoutfile = "$email2~$env:COMPUTERNAME~$c"
                     $date = (Get-date)
                     $outfile = "$date~$exportname~$parsed~$email2~$env:COMPUTERNAME~$c"
                     $outfile | out-file C:\temp\fix-displayname.log -Append -Encoding ascii
@@ -94,7 +93,6 @@ else {
     $date = (Get-date)
     $outfile = "$date~~~~Email Not Changed, $checkemail"
     $outfile | out-file C:\temp\fix-displayname.log -Append -Encoding ascii
-    $host = 
     $outfile2 = "$date~~~~Email Not Changed, $checkemail~$env:COMPUTERNAME"
     $netfq = $log + "fix-displayname.log"
     $outfile2 | out-file $netfq -Append -Encoding ascii\
