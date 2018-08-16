@@ -105,8 +105,7 @@ Set-ADUser -ChangePasswordAtLogon:$true -Identity:$ADAccountName -Server:$DC -Sm
 # All AD groups
 foreach ($grouptoadd in $groupstoadd) {add-adgroupmember -Identity $grouptoadd.Name -Members $ADAccountName -Server:$DC -Confirm:$false}
 Add-ADGroupMember -Identity alluser -Members $ADAccountName -Server:$DC
-Add-ADGroupMember -Identity "all users" -Members $ADAccountName -Server:$DC
-Add-ADGroupMember -Identity "All MaconBibb Employees" -Members $ADAccountName -Server:$DC
+
 
 # Exchange Mailbox creation
 Write-Host "Creating new Microsoft Exchange mailbox for $Firstname $Surname"
