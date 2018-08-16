@@ -62,25 +62,25 @@ $groupstoadd = ForEach ($group in $groups) {get-adgroup $group}
 Write-Host "Creating new active directory user accounnt for $Firstname $Surname"
 $ADAccountName = ($FirstInitial + $Surname)
 $UserCheck = Get-ADUser -LDAPFilter "(sAMAccountName=$ADAccountName)"
-If (($UserCheck) -eq $null) {
+If ($null -eq ($UserCheck)) {
     write-host "Active Directory user account created"
     New-ADUser -DisplayName:($Surname + ", " + $FirstName) -GivenName:$FirstName -Name:($Surname + ", " + $FirstName) -Path:$ADPath -SamAccountName:$ADAccountName -Server:$DC -Surname:$Surname -Type:"user" -UserPrincipalName:($ADAccountName + "@" + $Domain) -EmailAddress:($ADAccountName + "@" + $Domain) -AccountPassword:(ConvertTo-SecureString $password -AsPlainText -Force) -Enabled:$true
     Set-ADAccountControl -AccountNotDelegated:$false -AllowReversiblePasswordEncryption:$false -CannotChangePassword:$false -DoesNotRequirePreAuth:$false -Identity:$ADAccountName -PasswordNeverExpires:$false -Server:$DC -UseDESKeyOnly:$false
 }
 Else {
 
-    if ($MiddleInitial -ne $null) {
+    if ($null -ne $MiddleInitial) {
         Write-host "The automatically generated username ($AdAccountName) for $FirstName $Surname already exists. Trying ($FirstInitial$MiddleInitial$Surname)" 
         $ADAccountName = ($FirstInitial + $MiddleInitial + $Surname)
         $UserCheck = Get-ADUser -LDAPFilter "(sAMAccountName=$ADAccountName)"
-        If (($UserCheck) -eq $null) {  New-ADUser -DisplayName:($Surname + ", " + $FirstName + " " + $MiddleInitial) -GivenName:$FirstName -Name:($Surname + ", " + $FirstName + " " + $MiddleInitial) -Path:$ADPath -SamAccountName:$ADAccountName -Server:$DC -Surname:$Surname -Type:"user" -UserPrincipalName:($ADAccountName + "@" + $Domain) -EmailAddress:($ADAccountName + "@" + $Domain) -AccountPassword:(ConvertTo-SecureString $password -AsPlainText -Force) -Enabled:$true
+        If ($null -eq ($UserCheck)) {  New-ADUser -DisplayName:($Surname + ", " + $FirstName + " " + $MiddleInitial) -GivenName:$FirstName -Name:($Surname + ", " + $FirstName + " " + $MiddleInitial) -Path:$ADPath -SamAccountName:$ADAccountName -Server:$DC -Surname:$Surname -Type:"user" -UserPrincipalName:($ADAccountName + "@" + $Domain) -EmailAddress:($ADAccountName + "@" + $Domain) -AccountPassword:(ConvertTo-SecureString $password -AsPlainText -Force) -Enabled:$true
             Set-ADAccountControl -AccountNotDelegated:$false -AllowReversiblePasswordEncryption:$false -CannotChangePassword:$false -DoesNotRequirePreAuth:$false -Identity:$ADAccountName -PasswordNeverExpires:$false -Server:$DC -UseDESKeyOnly:$false
        
            }
         Else {
             $ADAccountName = Read-Host "The automatically generated username ($AdAccountName) for $FirstName $Surname also failed. Please Try something else"
             $UserCheck = Get-ADUser -LDAPFilter "(sAMAccountName=$ADAccountName)"
-            If (($UserCheck) -eq $null) {
+            If ($null -eq ($UserCheck)) {
                 New-ADUser -DisplayName:($Surname + ", " + $FirstName) -GivenName:$FirstName -Name:($Surname + ", " + $FirstName) -Path:$ADPath -SamAccountName:$ADAccountName -Server:$DC -Surname:$Surname -Type:"user" -UserPrincipalName:($ADAccountName + "@" + $Domain) -EmailAddress:($ADAccountName + "@" + $Domain) -AccountPassword:(ConvertTo-SecureString $password -AsPlainText -Force) -Enabled:$true
                 Set-ADAccountControl -AccountNotDelegated:$false -AllowReversiblePasswordEncryption:$false -CannotChangePassword:$false -DoesNotRequirePreAuth:$false -Identity:$ADAccountName -PasswordNeverExpires:$false -Server:$DC -UseDESKeyOnly:$false
             }
@@ -93,7 +93,7 @@ Else {
     else {
         $ADAccountName = Read-Host "The automatically generated username ($AdAccountName) for $FirstName $Surname failed. Please Try something else"
         $UserCheck = Get-ADUser -LDAPFilter "(sAMAccountName=$ADAccountName)"
-        If (($UserCheck) -eq $null) {
+        If ($null -eq ($UserCheck)) {
             New-ADUser -DisplayName:($Surname + ", " + $FirstName) -GivenName:$FirstName -Name:($Surname + ", " + $FirstName) -Path:$ADPath -SamAccountName:$ADAccountName -Server:$DC -Surname:$Surname -Type:"user" -UserPrincipalName:($ADAccountName + "@" + $Domain) -Description:$ADAccountName -EmailAddress:($ADAccountName + "@" + $Domain) -AccountPassword:(ConvertTo-SecureString $password -AsPlainText -Force) -Enabled:$true
             Set-ADAccountControl -AccountNotDelegated:$false -AllowReversiblePasswordEncryption:$false -CannotChangePassword:$false -DoesNotRequirePreAuth:$false -Identity:$ADAccountName -PasswordNeverExpires:$false -Server:$DC -UseDESKeyOnly:$false
         }
