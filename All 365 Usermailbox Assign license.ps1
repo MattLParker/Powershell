@@ -15,7 +15,7 @@ $SKU="default:ENTERPRISEPACK"
 
 #The Magic Happens.
 Get-Mailbox -ResultSize Unlimited -RecipientTypeDetails UserMailbox | Get-MsolUser | 
-foreach {set-msoluser -UserPrincipalName $_.UserPrincipalName -UsageLocation $UsageLocation
+ForEach-Object {set-msoluser -UserPrincipalName $_.UserPrincipalName -UsageLocation $UsageLocation
         Set-MsolUserLicense -UserPrincipalName $_.UserPrincipalName -addLicense $SKU
         Set-MsolUserLicense -UserPrincipalName $_.UserPrincipalName -LicenseOptions $L}
 
