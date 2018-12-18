@@ -18,4 +18,3 @@ Get-Mailbox -ResultSize Unlimited -RecipientTypeDetails UserMailbox | Get-MsolUs
 ForEach-Object {set-msoluser -UserPrincipalName $_.UserPrincipalName -UsageLocation $UsageLocation
         Set-MsolUserLicense -UserPrincipalName $_.UserPrincipalName -addLicense $SKU
         Set-MsolUserLicense -UserPrincipalName $_.UserPrincipalName -LicenseOptions $L}
-
